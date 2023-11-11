@@ -12,22 +12,13 @@ import java.util.List;
 @RequestMapping("/people")
 
 public class PeopleController {
-
-
     private final PeopleService peopleService;
-
-    // вот такая инициализация бина и его внедрение по конвенции
-
     public PeopleController(PeopleService peopleService) {
         this.peopleService = peopleService;
     }
-
-
     @GetMapping
     public List<Person> getAllPerson() {
-        List<Person> personList = peopleService.findAll();
-        return personList;       // model.addAttribute("people", peopleService.findAll());
-
+        return  peopleService.findAll();
     }
 
 

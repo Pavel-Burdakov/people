@@ -12,55 +12,55 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PeopleControllerTest {
-
     @Autowired
     MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private PeopleRepository peopleRepository;
-
     private Person person;
+    private final Person p1 = new Person("Test1", 11, "Test1@Test1.com");
+    private final Person p2 = new Person("Test2", 22, "Test2@Test2.com");
 
     @BeforeEach
     void setUpPerson() {
-        person = new Person("Test1", 11, "Test1@Test1.com");
-        // создать ptrsona в БД с помощью методов репозитория
+        peopleRepository.save(p1);
+        peopleRepository.save(p2);
     }
 
     @AfterEach
-    void clearDrones() {
+    void clearPerson() {
         peopleRepository.deleteAll();
     }
 
     @Test
-    void registerDroneSuccess() throws Exception {
-
+    void getAllPeopleSuccess() throws Exception {
+        List<Person> personList = List.of(p1, p2);
         mockMvc.perform(
                         get("/people")
-                                .content(objectMapper.writeValueAsString(person))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$.name").value("Test1"))
-                .andExpect((ResultMatcher) jsonPath("$.age").value(11))
-                .andExpect((ResultMatcher) jsonPath("$.email").value("Test1@Test1.com"));
+                .andExpect(content().json(objectMapper.writeValueAsString(personList)));
+
+
+
     }
+}
 
     /**
-     * поменять статус isCreated на isOk
+     * поменять статус isCreated на isOk +
      * поменять body
      * разделить базу данных
      * json pas поиск по массиву
@@ -68,5 +68,5 @@ public class PeopleControllerTest {
      * в контроллере сделать сделать созадиание и удаление персонов
      */
 
-}
+
 

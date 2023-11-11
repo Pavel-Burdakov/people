@@ -31,7 +31,6 @@ public class PeopleService {
         return foundPerson.orElse(null);
     }
 
-    @Transactional
     public void save(Person person){
         peopleRepository.save(person);
     }
