@@ -2,51 +2,50 @@ package com.example.servingwebcontent.controllers;
 
 import com.example.servingwebcontent.models.Person;
 import com.example.servingwebcontent.services.PeopleService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/people")
 
 public class PeopleController {
 
-    @Autowired
+
     private final PeopleService peopleService;
 
     // вот такая инициализация бина и его внедрение по конвенции
-    @Autowired
+
     public PeopleController(PeopleService peopleService) {
         this.peopleService = peopleService;
     }
 
 
-    @GetMapping()
-    public String index(Model model){
-
-        model.addAttribute("people", peopleService.findAll());
-        return "people/index";
+    @GetMapping
+    public List<Person> getAllPerson() {
+        List<Person> personList = peopleService.findAll();
+        return personList;       // model.addAttribute("people", peopleService.findAll());
 
     }
 
 
-    @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model){
-        model.addAttribute("person", peopleService.findOne(id));
-        return "people/person";
+   /* @GetMapping("/{id}")
+    public String show(@PathVariable("id") int id){
+        *//*model.addAttribute("person", peopleService.findOne(id));
+        return "people/person";*//*
     }
+*/
 
-
-    @GetMapping("/new")
+    /*@GetMapping("/new")
     public String newPerson(@ModelAttribute("person") Person person, Model model){
+
         return "people/new";
-    }
+    }*/
 
 
-    @PostMapping()
+   /* @PostMapping
     public String create(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult){
 
         if (bindingResult.hasErrors()){
@@ -84,5 +83,5 @@ public class PeopleController {
     public String populateHeaderMessage(){
         return "Welcome to our website";
     }
-
+*/
 }
