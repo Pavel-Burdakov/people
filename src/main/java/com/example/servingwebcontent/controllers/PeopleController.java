@@ -2,13 +2,13 @@ package com.example.servingwebcontent.controllers;
 
 import com.example.servingwebcontent.models.Person;
 import com.example.servingwebcontent.services.PeopleService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/people")
 
 public class PeopleController {
