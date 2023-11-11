@@ -1,4 +1,3 @@
-/*
 
 package com.example.servingwebcontent.test;
 
@@ -16,13 +15,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PeopleControllerTest {
-/*
+
     @Autowired
     MockMvc mockMvc;
 
@@ -37,6 +37,7 @@ public class PeopleControllerTest {
     @BeforeEach
     void setUpPerson() {
         person = new Person("Test1", 11, "Test1@Test1.com");
+        // создать ptrsona в БД с помощью методов репозитория
     }
 
     @AfterEach
@@ -46,14 +47,26 @@ public class PeopleControllerTest {
 
     @Test
     void registerDroneSuccess() throws Exception {
+
         mockMvc.perform(
-                        post("/people/new")
+                        get("/people")
                                 .content(objectMapper.writeValueAsString(person))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isCreated())
-                .andExpect((ResultMatcher) jsonPath("$.name").value("Test1"));
+                .andExpect(status().isOk())
+                .andExpect((ResultMatcher) jsonPath("$.name").value("Test1"))
+                .andExpect((ResultMatcher) jsonPath("$.age").value(11))
+                .andExpect((ResultMatcher) jsonPath("$.email").value("Test1@Test1.com"));
     }
 
+    /**
+     * поменять статус isCreated на isOk
+     * поменять body
+     * разделить базу данных
+     * json pas поиск по массиву
+     *
+     * в контроллере сделать сделать созадиание и удаление персонов
+     */
+
 }
-*/
+
