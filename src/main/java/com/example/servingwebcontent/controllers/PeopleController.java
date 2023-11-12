@@ -27,7 +27,8 @@ public class PeopleController {
         return  peopleService.findAll();
     }
 
-
+    // todo
+    // разобраться с ResponseEntity
     @PostMapping("/new")
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
         Person p = peopleRepository.save(person);

@@ -4,22 +4,19 @@ package com.example.servingwebcontent.test;
 import com.example.servingwebcontent.models.Person;
 import com.example.servingwebcontent.repositories.PeopleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,23 +24,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest
+
 @AutoConfigureMockMvc
-//@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PeopleControllerTest {
 
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
+    @LocalServerPort
+    private Integer port;
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
-
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            "postgres:15-alpine"
+    );
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -55,41 +47,72 @@ public class PeopleControllerTest {
     private final Person p2 = new Person("Test2", 22, "Test2@Test2.com");
     private final Person p3 = new Person("Test3", 33, "Test3@Test3.com");
 
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgres.stop();
+    }
     @BeforeEach
     void setUpPerson() {
-        peopleRepository.save(p1);
-        peopleRepository.save(p2);
+
     }
 
     @AfterEach
     void clearPerson() {
+
         peopleRepository.deleteAll();
+
+    }
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
     }
 
     @Test
     void getAllPeopleSuccess() throws Exception {
+
+        peopleRepository.save(p1);
+        peopleRepository.save(p2);
         List<Person> personList = List.of(p1, p2);
-        mockMvc.perform(
-                        get("/people")
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+        mockMvc.perform(get("/people"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(personList)));
     }
 
+    // TODO: 12.11.2023 сделать проверку того что объект сохранился, дописать методы контроллера
     @Test
     public void createOnePersonSuccess() throws Exception {
+
+        mockMvc.perform(get("/people"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").doesNotExist());
+
 
         mockMvc.perform(
                         post("/people/new")
                                 .content(objectMapper.writeValueAsString(p3))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.name").value("Test3"))
-                .andExpect(jsonPath("$.age").value(33))
-                .andExpect(jsonPath("$.email").value("Test3@Test3.com"));
+                .andExpect(status().isCreated());
+
+        List<Person> personList = List.of(p3);
+        mockMvc.perform(get("/people"))
+                .andExpect(status().isOk())
+                //.andExpect(jsonPath("$.name").value("Michail"));
+                .andExpect(content().json(objectMapper.writeValueAsString(p3)));
+
+
+
+
+
+
     }
 
 }
@@ -97,7 +120,7 @@ public class PeopleControllerTest {
     /**
      * поменять статус isCreated на isOk +
      * поменять body
-     * разделить базу данных
+     * разделить базу данных +
      * json pas поиск по массиву +
      *
      * в контроллере сделать сделать созадиание и удаление персонов
