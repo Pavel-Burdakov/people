@@ -92,26 +92,25 @@ public class PeopleControllerTest {
 
         mockMvc.perform(get("/people"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").doesNotExist());
+                .andExpect(jsonPath("$.[0].id").doesNotExist());
 
 
         mockMvc.perform(
                         post("/people/new")
-                                .content(objectMapper.writeValueAsString(p3))
+                                .content(objectMapper.writeValueAsString(p1))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isCreated());
 
-        List<Person> personList = List.of(p3);
+        List<Person> personList = List.of(p1);
+        System.out.println(p1.getId());
         mockMvc.perform(get("/people"))
                 .andExpect(status().isOk())
-                //.andExpect(jsonPath("$.name").value("Michail"));
-                .andExpect(content().json(objectMapper.writeValueAsString(p3)));
-
-
-
-
-
+                //.andExpect(jsonPath("$.[0].id").value(p1.getId()))
+                .andExpect(jsonPath("$.[0].name").value(p1.getName()))
+                .andExpect(jsonPath("$.[0].age").value(p1.getAge()))
+                .andExpect(jsonPath("$.[0].email").value(p1.getEmail()));
+                //.andExpect(content().json(objectMapper.writeValueAsString(personList)));
 
     }
 

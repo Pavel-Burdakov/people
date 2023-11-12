@@ -23,12 +23,14 @@ public class PeopleController {
 
     }
     @GetMapping
-    public List<Person> getAllPerson() {
-        return  peopleService.findAll();
+    public ResponseEntity<List<Person>> listAllPersons() {
+
+        List<Person> persons = peopleRepository.findAll();
+        return ResponseEntity.ok().body(persons);
+
     }
 
-    // todo
-    // разобраться с ResponseEntity
+    // todo разобраться с ResponseEntity
     @PostMapping("/new")
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
         Person p = peopleRepository.save(person);

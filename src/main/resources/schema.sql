@@ -1,5 +1,5 @@
 create table if not exists person (
-    id bigserial not null,
+    id serial not null,
     name varchar not null,
     age int,
     email varchar not null,
