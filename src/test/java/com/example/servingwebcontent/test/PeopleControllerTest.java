@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -53,17 +53,28 @@ public class PeopleControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(personList)));
+    }
 
-
+    @Test
+    void createOnePersonSuccess() throws Exception{
+        Person person = new Person("Test3", 33, "Test3@Test3.com");
+        mockMvc.perform(
+                        post("/people/new")
+                                .content(objectMapper.writeValueAsString(person))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated());
 
     }
+
+
 }
 
     /**
      * поменять статус isCreated на isOk +
      * поменять body
      * разделить базу данных
-     * json pas поиск по массиву
+     * json pas поиск по массиву +
      *
      * в контроллере сделать сделать созадиание и удаление персонов
      */

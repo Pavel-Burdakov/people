@@ -1,8 +1,12 @@
 package com.example.servingwebcontent.controllers;
 
 import com.example.servingwebcontent.models.Person;
+import com.example.servingwebcontent.repositories.PeopleRepository;
 import com.example.servingwebcontent.services.PeopleService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,12 +17,26 @@ import java.util.List;
 
 public class PeopleController {
     private final PeopleService peopleService;
-    public PeopleController(PeopleService peopleService) {
+    private final PeopleRepository peopleRepository;
+
+
+    public PeopleController(PeopleService peopleService, PeopleRepository peopleRepository) {
         this.peopleService = peopleService;
+        this.peopleRepository = peopleRepository;
+
     }
     @GetMapping
     public List<Person> getAllPerson() {
         return  peopleService.findAll();
+    }
+
+
+    @PostMapping("/new")
+    public ResponseEntity<Person> createPerson(Person person) {
+        Person p1 = peopleRepository.save(person);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(p1);
+
     }
 
 
