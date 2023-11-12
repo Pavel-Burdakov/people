@@ -32,6 +32,7 @@ public class PeopleControllerTest {
     private Person person;
     private final Person p1 = new Person("Test1", 11, "Test1@Test1.com");
     private final Person p2 = new Person("Test2", 22, "Test2@Test2.com");
+    private final Person p3 = new Person("Test3", 33, "Test3@Test3.com");
 
     @BeforeEach
     void setUpPerson() {
@@ -56,17 +57,19 @@ public class PeopleControllerTest {
     }
 
     @Test
-    void createOnePersonSuccess() throws Exception{
-        Person person = new Person("Test3", 33, "Test3@Test3.com");
+    public void createOnePersonSuccess() throws Exception {
+
         mockMvc.perform(
                         post("/people/new")
-                                .content(objectMapper.writeValueAsString(person))
+                                .content(objectMapper.writeValueAsString(p3))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isCreated());
-
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.name").value("Test3"))
+                .andExpect(jsonPath("$.age").value(33))
+                .andExpect(jsonPath("$.email").value("Test3@Test3.com"));
     }
-
 
 }
 

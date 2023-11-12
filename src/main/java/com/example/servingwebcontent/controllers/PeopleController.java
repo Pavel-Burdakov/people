@@ -5,10 +5,7 @@ import com.example.servingwebcontent.repositories.PeopleRepository;
 import com.example.servingwebcontent.services.PeopleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,11 +29,9 @@ public class PeopleController {
 
 
     @PostMapping("/new")
-    public ResponseEntity<Person> createPerson(Person person) {
-        Person p1 = peopleRepository.save(person);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(p1);
-
+    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
+        Person p = peopleRepository.save(person);
+        return ResponseEntity.status(201).body(p);
     }
 
 
