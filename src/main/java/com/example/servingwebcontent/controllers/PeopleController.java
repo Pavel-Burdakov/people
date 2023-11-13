@@ -4,10 +4,12 @@ import com.example.servingwebcontent.models.Person;
 import com.example.servingwebcontent.repositories.PeopleRepository;
 import com.example.servingwebcontent.services.PeopleService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/people")
@@ -27,7 +29,6 @@ public class PeopleController {
 
         List<Person> persons = peopleRepository.findAll();
         return ResponseEntity.ok().body(persons);
-
     }
 
     // todo разобраться с ResponseEntity
@@ -35,6 +36,16 @@ public class PeopleController {
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
         Person p = peopleRepository.save(person);
         return ResponseEntity.status(201).body(p);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Person> getPerson(@PathVariable("id") int id) throws Exception {
+
+        Optional<Person> person = peopleRepository.findById(id);
+        if (!person.isPresent())
+            return null;
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(person.get());
+
     }
 
 
@@ -45,11 +56,6 @@ public class PeopleController {
     }
 */
 
-    /*@GetMapping("/new")
-    public String newPerson(@ModelAttribute("person") Person person, Model model){
-
-        return "people/new";
-    }*/
 
 
    /* @PostMapping
