@@ -35,12 +35,6 @@ public class PeopleService {
         peopleRepository.save(person);
     }
 
-    @Transactional
-    public void update (int id, Person updatedPerson){
-        //если в БД уже есть такой id, то метод save будет обновлять
-        updatedPerson.setId(id);
-        peopleRepository.save(updatedPerson);
-    }
 
     @Transactional
     public void delete(int id){

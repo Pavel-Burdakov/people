@@ -1,9 +1,10 @@
 package com.example.servingwebcontent.controllers;
-
+import com.example.servingwebcontent.exception.EntityAlreadyExist;
+import com.example.servingwebcontent.exception.EntityNotFoundException;
 import com.example.servingwebcontent.models.Person;
 import com.example.servingwebcontent.repositories.PeopleRepository;
 import com.example.servingwebcontent.services.PeopleService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,88 +14,59 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/people")
-
 public class PeopleController {
     private final PeopleService peopleService;
     private final PeopleRepository peopleRepository;
 
-
     public PeopleController(PeopleService peopleService, PeopleRepository peopleRepository) {
         this.peopleService = peopleService;
         this.peopleRepository = peopleRepository;
-
     }
+
     @GetMapping
     public ResponseEntity<List<Person>> listAllPersons() {
-
         List<Person> persons = peopleRepository.findAll();
         return ResponseEntity.ok().body(persons);
     }
 
-    // todo разобраться с ResponseEntity
+    // todo еще раз разобраться с ResponseEntity, RequestBody
     @PostMapping("/new")
-    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
-        Person p = peopleRepository.save(person);
-        return ResponseEntity.status(201).body(p);
+    public ResponseEntity<Person> createPerson(@RequestBody Person person) throws EntityAlreadyExist {
+        Optional<Person> p = peopleRepository.findByEmail(person.getEmail());
+        if (p.isPresent()) {
+            throw new EntityAlreadyExist(person.getEmail());
+        }
+        Person p1 = peopleRepository.save(person);
+        return ResponseEntity.status(201).body(p1);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Person> getPerson(@PathVariable("id") int id) throws Exception {
-
+    public ResponseEntity<Person> getPerson(@PathVariable("id") int id) throws EntityNotFoundException {
         Optional<Person> person = peopleRepository.findById(id);
         if (!person.isPresent())
-            return null;
+            throw new EntityNotFoundException(id);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(person.get());
-
     }
 
-
-   /* @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id){
-        *//*model.addAttribute("person", peopleService.findOne(id));
-        return "people/person";*//*
-    }
-*/
-
-
-
-   /* @PostMapping
-    public String create(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult){
-
-        if (bindingResult.hasErrors()){
-            return "people/new";
-        }
-        peopleService.save(person);
-        return "redirect:/people";
+    @PutMapping(value = "/edit/{personId}")
+    public ResponseEntity<Person> updatePerson(@RequestBody @Valid Person person,
+                                               @PathVariable("personId") int personId) throws EntityNotFoundException {
+        Optional<Person> p = peopleRepository.findById(personId);
+        if (!p.isPresent())
+            throw new EntityNotFoundException(personId);
+        Person oldPerson = p.get();
+        oldPerson.setName(person.getName());
+        oldPerson.setAge(person.getAge());
+        oldPerson.setEmail(person.getEmail());
+        return ResponseEntity.ok().body(peopleRepository.save(oldPerson));
     }
 
-    @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id") int id, Model model){
-        model.addAttribute("person", peopleService.findOne(id));
-        return "people/edit";
+    @DeleteMapping(value = "/{personId}")
+    public ResponseEntity<Person> deletePerson(@PathVariable("personId") int personId) throws EntityNotFoundException {
+        Optional<Person> p = peopleRepository.findById(personId);
+        if (!p.isPresent())
+            throw new EntityNotFoundException(personId);
+        peopleRepository.deleteById(personId);
+        return ResponseEntity.ok().body(p.get());
     }
-
-    @PatchMapping("/{id}")
-    public String update(@ModelAttribute("person") @Valid Person person,
-                         BindingResult bindingResult, @PathVariable("id") int id) {
-        if (bindingResult.hasErrors()){
-            return "people/edit";
-        }
-        peopleService.update(id, person);
-        return "redirect:/people";
-    }
-
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id){
-        peopleService.delete(id);
-        return "redirect:/people";
-
-    }
-
-
-    @ModelAttribute("headerMessage")
-    public String populateHeaderMessage(){
-        return "Welcome to our website";
-    }
-*/
 }
