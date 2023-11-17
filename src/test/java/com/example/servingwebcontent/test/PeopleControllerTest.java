@@ -137,8 +137,18 @@ public class PeopleControllerTest {
                 .andExpect(jsonPath("$.[0].email").value(p2.getEmail()));
         mockMvc.perform(
                         put("/people/edit/545454543"))
-                .andExpect(status().isNotFound())
                 .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(EntityNotFoundException.class));
+    }
+
+    @Test
+    public void deleteOnePersonSuccess() throws Exception {
+        peopleRepository.save(p1);
+        int idPersonToDelete = p1.getId();
+        mockMvc.perform(
+                        delete("/people/delete/{id}", idPersonToDelete))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/people/{id}", idPersonToDelete))
+                .andExpect(status().isNotFound());
     }
 }
 

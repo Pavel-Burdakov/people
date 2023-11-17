@@ -61,7 +61,7 @@ public class PeopleController {
         return ResponseEntity.ok().body(peopleRepository.save(oldPerson));
     }
 
-    @DeleteMapping(value = "/{personId}")
+    @DeleteMapping(value = "delete/{personId}")
     public ResponseEntity<Person> deletePerson(@PathVariable("personId") int personId) throws EntityNotFoundException {
         Optional<Person> p = peopleRepository.findById(personId);
         if (!p.isPresent())
