@@ -94,7 +94,7 @@ public class PeopleControllerTest {
                 .andExpect(status().isCreated());
         mockMvc.perform(get("/people"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").isNumber())
+                .andExpect(jsonPath("$.[0].id").value((p1.getId())))
                 .andExpect(jsonPath("$.[0].email").value(p1.getEmail()));
         mockMvc.perform(
                         post("/people/new")
@@ -103,6 +103,26 @@ public class PeopleControllerTest {
                 )
                 .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(EntityAlreadyExist.class));
     }
+
+    @Test
+    public void createOnePersonSuccess1() throws Exception {
+        mockMvc.perform(get("/people"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+        mockMvc.perform(
+                        post("/people/new")
+                                .content(objectMapper.writeValueAsString(p1))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated());
+        mockMvc.perform(get("/people"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value((p1.getId())))
+                .andExpect(jsonPath("$.[0].email").value(p1.getEmail()));
+    }
+
+
+
 
     @Test
     public void getPersonByIdSuccess() throws Exception {

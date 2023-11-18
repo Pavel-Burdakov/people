@@ -13,7 +13,10 @@ import java.util.Objects;
 public class Person {
     @Id
     @Column(name="id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menuSeq")
+    @SequenceGenerator(name = "menuSeq", initialValue = 1, allocationSize = 1, sequenceName = "MENU_SEQUENCE")
+
+
     private int id;
 
     @NotEmpty(message = "Name should not be empty")

@@ -6,3 +6,9 @@ create table if not exists person (
     primary key (id),
     UNIQUE (email)
 );
+
+create sequence menu_sequence
+start 0
+increment 1
+minvalue 0
+OWNED BY person.id;
