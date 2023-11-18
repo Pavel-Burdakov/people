@@ -7,7 +7,7 @@ create table if not exists person (
     UNIQUE (email)
 );
 
-create sequence menu_sequence
+create sequence person_sequence
 start 0
 increment 1
 minvalue 0

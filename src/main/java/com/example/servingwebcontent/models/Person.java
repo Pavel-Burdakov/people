@@ -1,5 +1,4 @@
 package com.example.servingwebcontent.models;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -12,29 +11,23 @@ import java.util.Objects;
 @Table(name = "person")
 public class Person {
     @Id
-    @Column(name="id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menuSeq")
-    @SequenceGenerator(name = "menuSeq", initialValue = 1, allocationSize = 1, sequenceName = "MENU_SEQUENCE")
-
-
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personSeq")
+    @SequenceGenerator(name = "personSeq", initialValue = 0, allocationSize = 1, sequenceName = "person_sequence")
     private int id;
-
     @NotEmpty(message = "Name should not be empty")
     @Size(min = 2, max = 30, message = "Name should be between 2 and 30 characters")
     @Column(name = "name")
     private String name;
-
     @Column(name = "age")
     @Min(value = 0, message = "Age should be greater than 0")
     private int age;
-
     @NotEmpty(message = "Name should not be empty")
     @Email(message = "Email should be valid")
     @Column(name = "email")
     private String email;
 
     public Person(String name, int age, String email) {
-
         this.name = name;
         this.age = age;
         this.email = email;

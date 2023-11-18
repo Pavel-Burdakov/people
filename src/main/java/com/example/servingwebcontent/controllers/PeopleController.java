@@ -36,8 +36,8 @@ public class PeopleController {
         if (p.isPresent()) {
             throw new EntityAlreadyExist(person.getEmail());
         }
-        Person p1 = peopleRepository.save(person);
-        return ResponseEntity.status(201).body(p1);
+        peopleRepository.save(person);
+        return ResponseEntity.status(201).body(person);
     }
 
     @GetMapping(value = "/{id}")
