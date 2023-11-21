@@ -48,12 +48,11 @@ public class PeopleController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(person.get());
     }
 
-    @PutMapping(value = "/edit/{personId}")
-    public ResponseEntity<Person> updatePerson(@RequestBody @Valid Person person,
-                                               @PathVariable("personId") int personId) throws EntityNotFoundException {
-        Optional<Person> p = peopleRepository.findById(personId);
+    @PutMapping
+    public ResponseEntity<Person> updatePerson(@RequestBody @Valid Person person) throws EntityNotFoundException {
+        Optional<Person> p = peopleRepository.findById(person.getId());
         if (!p.isPresent())
-            throw new EntityNotFoundException(personId);
+            throw new EntityNotFoundException(person.getId());
         Person oldPerson = p.get();
         oldPerson.setName(person.getName());
         oldPerson.setAge(person.getAge());

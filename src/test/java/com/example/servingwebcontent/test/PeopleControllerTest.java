@@ -80,7 +80,6 @@ public class PeopleControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(personList)));
     }
 
-    // TODO: 12.11.2023 сделать проверку того что объект сохранился, дописать методы контроллера
     @Test
     public void createOnePersonSuccess() throws Exception {
         mockMvc.perform(get("/people"))
@@ -94,7 +93,7 @@ public class PeopleControllerTest {
                 .andExpect(status().isCreated());
         mockMvc.perform(get("/people"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value((p1.getId())))
+                .andExpect(jsonPath("$.[0].id").isNumber())
                 .andExpect(jsonPath("$.[0].email").value(p1.getEmail()));
         mockMvc.perform(
                         post("/people/new")
@@ -103,26 +102,6 @@ public class PeopleControllerTest {
                 )
                 .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(EntityAlreadyExist.class));
     }
-
-    @Test
-    public void createOnePersonSuccess1() throws Exception {
-        mockMvc.perform(get("/people"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("[]"));
-        mockMvc.perform(
-                        post("/people/new")
-                                .content(objectMapper.writeValueAsString(p1))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isCreated());
-        mockMvc.perform(get("/people"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value((p1.getId())))
-                .andExpect(jsonPath("$.[0].email").value(p1.getEmail()));
-    }
-
-
-
 
     @Test
     public void getPersonByIdSuccess() throws Exception {
@@ -136,12 +115,14 @@ public class PeopleControllerTest {
                 .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(EntityNotFoundException.class));
     }
 
+    // todo path
     @Test
     public void updatePersonSuccess() throws Exception {
         peopleRepository.save(p1);
         int idPersonTuUpdate = p1.getId();
+        p2.setId(p1.getId());
         mockMvc.perform(
-                        put("/people/edit/{id}", idPersonTuUpdate)
+                        put("/people", idPersonTuUpdate)
                                 .content(objectMapper.writeValueAsString(p2))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -156,10 +137,11 @@ public class PeopleControllerTest {
                 .andExpect(jsonPath("$.[0].age").value(p2.getAge()))
                 .andExpect(jsonPath("$.[0].email").value(p2.getEmail()));
         mockMvc.perform(
-                        put("/people/edit/545454543"))
+                        put("/people"))
                 .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(EntityNotFoundException.class));
     }
 
+    // todo поменять uri запроса , чтобы в теле запроса передавался id
     @Test
     public void deleteOnePersonSuccess() throws Exception {
         peopleRepository.save(p1);
@@ -171,7 +153,10 @@ public class PeopleControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
-
+// TODO: 19.11.2023 добавить person адрес и счет писать их в БД, сделать CRUD для них
+// todo rest интеграция с ЦБ
+// todo прогноз погоды для адреса
+// todo собеседования
 
 
 

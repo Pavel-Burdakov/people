@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -26,6 +27,8 @@ public class Person {
     @Email(message = "Email should be valid")
     @Column(name = "email")
     private String email;
+    @OneToMany(mappedBy = "owner")
+    private List<Account> accountList;
 
     public Person(String name, int age, String email) {
         this.name = name;
