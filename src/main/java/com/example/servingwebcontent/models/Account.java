@@ -1,5 +1,6 @@
 package com.example.servingwebcontent.models;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 
 @Entity
 @Table(name = "account")
@@ -12,8 +13,9 @@ public class Account {
     private String currency;
     @Column(name = "money_available")
     private int moneyAvailable;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id", referencedColumnName = "id")
+    //@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private Person owner;
 
     public Account() {
@@ -23,6 +25,11 @@ public class Account {
         this.currency = currency;
         this.moneyAvailable = moneyAvailable;
         this.owner = owner;
+    }
+
+    public Account(String currency, int moneyAvailable) {
+        this.currency = currency;
+        this.moneyAvailable = moneyAvailable;
     }
 
     public int getId() {

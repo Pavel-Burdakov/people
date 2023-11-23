@@ -1,3 +1,4 @@
+
 create table if not exists person (
     id serial not null,
     name varchar not null,
@@ -7,7 +8,9 @@ create table if not exists person (
     UNIQUE (email)
 );
 
-create table account (
+
+
+create table if not exists account (
     account_number serial not null,
     currency varchar(25) not null,
     money_available int not null,
@@ -16,8 +19,4 @@ create table account (
 );
 
 
-create sequence person_sequence
-start 1
-increment 1
-minvalue 0
-OWNED BY person.id;
+
