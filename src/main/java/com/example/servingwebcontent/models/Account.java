@@ -13,7 +13,7 @@ public class Account {
     private String currency;
     @Column(name = "money_available")
     private int moneyAvailable;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     //@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private Person owner;

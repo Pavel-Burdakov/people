@@ -1,4 +1,7 @@
 package com.example.servingwebcontent.models;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -32,7 +35,12 @@ public class Person {
     private String email;
     //@OneToMany(mappedBy = "owner")
     //@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    // @JsonIgnore
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
+
     private List<Account> accountList;
 
     public Person(String name, int age, String email) {
