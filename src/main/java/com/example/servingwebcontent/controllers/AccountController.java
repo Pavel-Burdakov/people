@@ -1,17 +1,20 @@
 package com.example.servingwebcontent.controllers;
 import com.example.servingwebcontent.exception.EntityAlreadyExist;
 import com.example.servingwebcontent.exception.EntityNotFoundException;
+import com.example.servingwebcontent.exception.ServiceException;
 import com.example.servingwebcontent.models.Account;
-import com.example.servingwebcontent.models.Person;
 import com.example.servingwebcontent.models.PersonWrapper;
 import com.example.servingwebcontent.repositories.AccountRepository;
 import com.example.servingwebcontent.repositories.PeopleRepository;
 import com.example.servingwebcontent.services.AccountService;
+import com.example.servingwebcontent.services.ExchangeRateService;
 import jakarta.validation.Valid;
+import org.hibernate.boot.jaxb.hbm.internal.ExecuteUpdateResultCheckStyleConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.servingwebcontent.services.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +24,8 @@ public class AccountController {
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final PeopleRepository peopleRepository;
+    @Autowired
+    ExchangeRateService exchangeRateService;
 
     public AccountController(AccountRepository accountRepository, AccountService accountService, PeopleRepository peopleRepository) {
         this.accountRepository = accountRepository;
@@ -65,6 +70,30 @@ public class AccountController {
         if (!account.isPresent())
             throw new EntityNotFoundException(id);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(account.get());
+    }
+
+    @GetMapping(value = "/{id}/{currency}")
+    public ResponseEntity<Double> convertCurrency(@PathVariable("id") int id, @PathVariable("currency") String currency) throws Exception {
+        Optional<Account> account = accountRepository.findById(id);
+        if (!account.isPresent())
+            throw new EntityNotFoundException(id);
+        if (!account.get().getCurrency().equals("RUB")) {
+            throw new ServiceException("конвертация только рублевого счета ");
+        }
+        System.out.println(exchangeRateService.getUSDCurrencyRate());
+        switch (currency) {
+            case "USD" -> {
+                String ups = exchangeRateService.getUSDCurrencyRate().replace(',', '.');
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Double.parseDouble(ups) * account.get().getMoneyAvailable());
+            }
+            case "EUR" -> {
+                String ups = exchangeRateService.getEURCurrencyRate().replace(',', '.');
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Double.parseDouble(ups) * account.get().getMoneyAvailable());
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     @DeleteMapping(value = "delete/{accountId}")
