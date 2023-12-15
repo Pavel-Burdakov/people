@@ -21,7 +21,7 @@ public class exchangeRateServiceImpl implements ExchangeRateService {
 
     @Override
     public String getUSDCurrencyRate() throws ServiceException {
-        var xml = cbrClient.getCurrencyRatesXML();
+        String xml = cbrClient.getCurrencyRatesXML();
         return extractCurrencyValueFromXML(xml, USD_XPATH);
     }
 

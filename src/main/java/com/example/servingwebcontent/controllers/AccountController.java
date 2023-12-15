@@ -80,6 +80,7 @@ public class AccountController {
         if (!account.get().getCurrency().equals("RUB")) {
             throw new ServiceException("конвертация только рублевого счета ");
         }
+        // TODO: 11.12.2023 поменять на логирования уровня инфо 
         System.out.println(exchangeRateService.getUSDCurrencyRate());
         switch (currency) {
             case "USD" -> {
