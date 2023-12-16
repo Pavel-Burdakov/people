@@ -1,19 +1,29 @@
 package com.example.servingwebcontent.test;
 import com.example.servingwebcontent.client.cbrClient;
+import com.example.servingwebcontent.models.Person;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpGet;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.HttpClients;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpResponse;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.ResultMatcher;
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.util.StreamUtils.copyToString;
 
 import java.io.IOException;
@@ -27,7 +37,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WireMockTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles({"test"})
 public class RateTest {
+    @Autowired
+    private WebTestClient webTestClient;
     private static Logger logger = Logger.getLogger(RateTest.class.getName());
     //  https://www.cbr.ru/scripts/XML_daily.asp
     static String apiUrl = "/rate";
@@ -47,30 +61,18 @@ public class RateTest {
                         )
                 ));
     }
+    // TODO: 11.12.2023 точка останова на вызове контроллера и проверить что он идет на stub
 
-    // TODO: 11.12.2023 точка останова на вызове контроллера и проверить что он идет на stub 
     @Test
-    void simpleStubTesting(WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
-        HttpGet request = new HttpGet("http://localhost:8081/rate");
-        CloseableHttpClient client = HttpClients.createDefault();
-        String response = client.execute(request, new BasicHttpClientResponseHandler());
-        logger.info(response);
-        HttpGet request1 = new HttpGet("http://localhost:8080/account/8/EUR");
-        CloseableHttpClient client1 = HttpClients.createDefault();
-        String response1 = client.execute(request1, new BasicHttpClientResponseHandler());
-        logger.info(response1);
-        //String stringResponse = convertHttpResponseToString(httpResponse);
-
-        //Hit API and check response
-        String apiResponse = getContent(wmRuntimeInfo.getHttpBaseUrl() + apiUrl);
-        //assertEquals("vvn", apiResponse);
-        //Verify API is hit
-        verify(getRequestedFor(urlEqualTo(apiUrl)));
-        wireMockServer.stop();
-    }
-
-    private String getContent(String url) {
-        TestRestTemplate testRestTemplate = new TestRestTemplate();
-        return testRestTemplate.getForObject(url, String.class);
+    void apiCbrTest() throws Exception {
+        webTestClient
+                .get()
+                .uri("/account/8/EUR")
+                .exchange()
+                .expectAll(
+                        responseSpec -> responseSpec.expectStatus().isOk(),
+                        responseSpec -> responseSpec.expectHeader().contentType(MediaType.APPLICATION_JSON),
+                        responseSpec -> responseSpec.expectBody().json("10000.0")
+                );
     }
 }

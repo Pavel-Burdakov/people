@@ -11,16 +11,15 @@ import java.net.URL;
 @Component
 public class cbrClient {
     private OkHttpClient okHttpClient = new OkHttpClient();
-    @Value("${cbr,currency.rates.xml.url}")
+    @Value("${cbr.currency.rates.xml.url}")
     String url;
     String mockUrl = "http://localhost:8081/rate";
-
-
+    //TODO переписать интеграцию
 
     public String getCurrencyRatesXML() throws ServiceException {
         // формируем запрос
         var request = new Request.Builder()
-                .url(mockUrl)
+                .url(url)
                 .build();
         // выполняем запрос и сохраняем ответ в переменной response
         // конструкция auto close и может выбрасывать исключения, поэтому try with resources
