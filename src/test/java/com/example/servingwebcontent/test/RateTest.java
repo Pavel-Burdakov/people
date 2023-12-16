@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.*;
+import org.junit.platform.engine.TestExecutionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -24,6 +25,8 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.util.StreamUtils.copyToString;
 
 import java.io.IOException;
@@ -42,6 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RateTest {
     @Autowired
     private WebTestClient webTestClient;
+    @Autowired
+    MockMvc mockMvc;
     private static Logger logger = Logger.getLogger(RateTest.class.getName());
     //  https://www.cbr.ru/scripts/XML_daily.asp
     static String apiUrl = "/rate";
@@ -61,7 +66,19 @@ public class RateTest {
                         )
                 ));
     }
+
     // TODO: 11.12.2023 точка останова на вызове контроллера и проверить что он идет на stub
+    @Test
+    void problemTest1() throws Exception {
+        mockMvc.perform((RequestBuilder) get("/account/8/EUR"))
+                .andExpect((ResultMatcher) status(200));
+    }
+
+    @Test
+    void problemTest2() throws Exception {
+        mockMvc.perform(get("/account/8/EUR"))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void apiCbrTest() throws Exception {
