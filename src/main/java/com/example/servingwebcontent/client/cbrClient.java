@@ -28,7 +28,7 @@ public class cbrClient {
         return response;
     }
 
-/*    public String getCurrencyRatesXML() throws ServiceException {
+    /*public String getCurrencyRatesXML() throws ServiceException {
         // формируем запрос
         var request = new Request.Builder()
                 .url(url)

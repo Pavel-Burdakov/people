@@ -24,12 +24,11 @@ import static org.springframework.util.StreamUtils.copyToString;
 public class RateTest {
     @Autowired
     private WebTestClient webTestClient;
-
     private static Logger logger = Logger.getLogger(RateTest.class.getName());
-    //  https://www.cbr.ru/scripts/XML_daily.asp
     static String apiUrl = "/rate";
     private static final String RESPONSE_FILE = "XML_daily.asp";
     private static WireMockServer wireMockServer = new WireMockServer(8081);
+
     @BeforeEach
     void configure() throws IOException {
         wireMockServer.start();
@@ -42,23 +41,23 @@ public class RateTest {
                         )
                 ));
     }
+
+    @AfterEach
+    void stop() {
+        wireMockServer.stop();
+    }
     // TODO: 11.12.2023 точка останова на вызове контроллера и проверить что он идет на stub
 
     @Test
     void apiCbrTest() throws Exception {
         webTestClient
                 .get()
-                .uri("/account/8/EUR")
+                .uri("/account/7/EUR")
                 .exchange()
                 .expectAll(
                         responseSpec -> responseSpec.expectStatus().isOk(),
                         responseSpec -> responseSpec.expectHeader().contentType(MediaType.APPLICATION_JSON),
                         responseSpec -> responseSpec.expectBody().json("10000.0")
                 );
-    }
-
-    @AfterEach
-    void stop() {
-        wireMockServer.stop();
     }
 }
