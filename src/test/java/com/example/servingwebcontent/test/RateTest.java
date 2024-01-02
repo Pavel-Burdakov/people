@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import static org.springframework.util.StreamUtils.copyToString;
 
 @WireMockTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient(timeout = "10000")
 @ActiveProfiles({"test"})
 public class RateTest {
     @Autowired
@@ -27,12 +29,13 @@ public class RateTest {
     private static Logger logger = Logger.getLogger(RateTest.class.getName());
     static String apiUrl = "/rate";
     private static final String RESPONSE_FILE = "XML_daily.asp";
+    //private static WireMockServer wireMockServer = new WireMockServer(new WireMockConfiguration().dynamicPort());
     private static WireMockServer wireMockServer = new WireMockServer(8081);
 
     @BeforeEach
     void configure() throws IOException {
         wireMockServer.start();
-        configureFor("localhost", 8081);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(apiUrl))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
@@ -52,7 +55,7 @@ public class RateTest {
     void apiCbrTest() throws Exception {
         webTestClient
                 .get()
-                .uri("/account/7/EUR")
+                .uri("/account/8/EUR")
                 .exchange()
                 .expectAll(
                         responseSpec -> responseSpec.expectStatus().isOk(),

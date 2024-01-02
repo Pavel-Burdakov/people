@@ -1,8 +1,11 @@
 package com.example.servingwebcontent.client;
 import com.example.servingwebcontent.exception.ServiceException;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 public class cbrClient {
@@ -15,7 +18,6 @@ public class cbrClient {
         this.clientFeign = clientFeign;
     }
     //TODO переписать интеграцию
-
     public String getCurrencyRatesXML() throws ServiceException {
         // формируем запрос
         // выполняем запрос и сохраняем ответ в переменной response
@@ -28,7 +30,7 @@ public class cbrClient {
         return response;
     }
 
-    /*public String getCurrencyRatesXML() throws ServiceException {
+    public String getCurrencyRatesXML5() throws ServiceException {
         // формируем запрос
         var request = new Request.Builder()
                 .url(url)
@@ -44,5 +46,5 @@ public class cbrClient {
         } catch (IOException e) {
             throw new ServiceException("Ошибка получения курсов валют", e);
         }
-    }*/
+    }
 }
