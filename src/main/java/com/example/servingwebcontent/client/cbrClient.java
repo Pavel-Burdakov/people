@@ -17,6 +17,7 @@ public class cbrClient {
     public cbrClient(cbrClientFeign clientFeign) {
         this.clientFeign = clientFeign;
     }
+
     //TODO переписать интеграцию
     public String getCurrencyRatesXML() throws ServiceException {
         // формируем запрос
